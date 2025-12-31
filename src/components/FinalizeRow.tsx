@@ -1,14 +1,10 @@
-export const FinalizedRow = ({letters}: {letters: string[]}) => {
+export const FinalizedRow = ({ letters }: { letters: string[] }) => {
 	return (
-		<div style={styles.row}>
+		<div className="row">
 			{letters.map((letter, index) => (
 				<div
 					key={index}
-					style={{
-						...styles.tile,
-						...styles.tileFinalized,
-						...(letter ? styles.tileCorrect : {}),
-					}}
+					className={`tile tile-finalized${letter ? ' tile-correct' : ''}`}
 				>
 					{letter || ''}
 				</div>

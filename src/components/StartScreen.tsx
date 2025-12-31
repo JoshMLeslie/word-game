@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export const StartScreen = ({onStart}: {onStart: Function}) => {
+export const StartScreen = ({ onStart }: { onStart: (length: number) => void }) => {
 	const [selectedLength, setSelectedLength] = useState(5);
 
 	return (
@@ -9,14 +9,11 @@ export const StartScreen = ({onStart}: {onStart: Function}) => {
 				<h1 className="title">Word Guess</h1>
 				<p className="subtitle">Select word length to begin</p>
 
-				<div className="lengthSelector">
+				<div className="length-selector">
 					{[4, 5, 6, 7, 8].map((length) => (
 						<button
 							key={length}
-							className={
-								'lengthButton' +
-								(selectedLength === length ? ' lengthButtonActive' : '')
-							}
+							className={`length-button${selectedLength === length ? ' active' : ''}`}
 							onClick={() => setSelectedLength(length)}
 						>
 							{length}
@@ -24,7 +21,7 @@ export const StartScreen = ({onStart}: {onStart: Function}) => {
 					))}
 				</div>
 
-				<button className="startButton" onClick={() => onStart(selectedLength)}>
+				<button className="start-button" onClick={() => onStart(selectedLength)}>
 					Start Game
 				</button>
 			</div>

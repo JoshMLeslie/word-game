@@ -70,17 +70,36 @@ export default function App() {
 		if (guess.length !== wordLength) return;
 
 		const newDiscovered = [...discoveredLetters];
-		const newStates: LetterState[] = [];
+		const newStates: LetterState[] = Array(wordLength).fill('');
 		let allCorrect = true;
 
-		// Evaluate each letter
+		// Count available letters in target (excluding already discovered positions)
+		const availableLetters: Record<string, number> = {};
+		for (let i = 0; i < wordLength; i++) {
+			const letter = targetWord[i];
+			if (!discoveredLetters[i]) {
+				availableLetters[letter] = (availableLetters[letter] || 0) + 1;
+			}
+		}
+
+		// First pass: mark correct letters and decrement available count
 		for (let i = 0; i < wordLength; i++) {
 			const letter = currentGuess[i];
 			if (letter === targetWord[i]) {
 				newDiscovered[i] = letter;
 				newStates[i] = 'correct';
-			} else if (targetWord.includes(letter)) {
+				availableLetters[letter]--;
+			}
+		}
+
+		// Second pass: mark present/absent for remaining letters
+		for (let i = 0; i < wordLength; i++) {
+			if (newStates[i]) continue; // Already marked as correct
+
+			const letter = currentGuess[i];
+			if (availableLetters[letter] > 0) {
 				newStates[i] = 'present';
+				availableLetters[letter]--;
 				allCorrect = false;
 			} else {
 				newStates[i] = 'absent';

@@ -1,9 +1,9 @@
 interface EndScreenProps {
-	stats: GameStats,
-	targetWord: string,
-	guessCount: number,
-	onContinue: Function,
-	onChangeLength: Function,
+	stats: GameStats;
+	targetWord: string;
+	guessCount: number;
+	onContinue: () => void;
+	onChangeLength: () => void;
 }
 
 export const EndScreen = ({
@@ -14,45 +14,45 @@ export const EndScreen = ({
 	onChangeLength,
 }: EndScreenProps) => {
 	return (
-		<div style={styles.container}>
-			<div style={styles.content}>
-				<h1 style={styles.winTitle}>🎉 You Won!</h1>
-				<p style={styles.winSubtitle}>
+		<div className="container">
+			<div className="content">
+				<h1 className="win-title">You Won!</h1>
+				<p className="win-subtitle">
 					The word was: <strong>{targetWord}</strong>
 				</p>
-				<p style={styles.winSubtitle}>Guesses: {guessCount}</p>
+				<p className="win-subtitle">Guesses: {guessCount}</p>
 
-				<div style={styles.statsBox}>
-					<h3 style={styles.statsTitle}>Your Stats</h3>
-					<div style={styles.statsGrid}>
-						<div style={styles.statItem}>
-							<div style={styles.statValue}>{stats.gamesPlayed}</div>
-							<div style={styles.statLabel}>Played</div>
+				<div className="stats-box">
+					<h3 className="stats-title">Your Stats</h3>
+					<div className="stats-grid">
+						<div className="stat-item">
+							<div className="stat-value">{stats.gamesPlayed}</div>
+							<div className="stat-label">Played</div>
 						</div>
-						<div style={styles.statItem}>
-							<div style={styles.statValue}>{stats.gamesWon}</div>
-							<div style={styles.statLabel}>Won</div>
+						<div className="stat-item">
+							<div className="stat-value">{stats.gamesWon}</div>
+							<div className="stat-label">Won</div>
 						</div>
-						<div style={styles.statItem}>
-							<div style={styles.statValue}>
+						<div className="stat-item">
+							<div className="stat-value">
 								{stats.gamesPlayed > 0
 									? Math.round((stats.gamesWon / stats.gamesPlayed) * 100)
 									: 0}
 								%
 							</div>
-							<div style={styles.statLabel}>Win Rate</div>
+							<div className="stat-label">Win Rate</div>
 						</div>
-						<div style={styles.statItem}>
-							<div style={styles.statValue}>{stats.currentStreak}</div>
-							<div style={styles.statLabel}>Streak</div>
+						<div className="stat-item">
+							<div className="stat-value">{stats.currentStreak}</div>
+							<div className="stat-label">Streak</div>
 						</div>
 					</div>
 				</div>
 
-				<button style={styles.startButton} onClick={onContinue}>
+				<button className="start-button" onClick={onContinue}>
 					Continue
 				</button>
-				<button style={styles.secondaryButton} onClick={onChangeLength}>
+				<button className="secondary-button" onClick={onChangeLength}>
 					Change Length
 				</button>
 			</div>

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import type { UseGameStateReturn } from '../util/hooks';
 
 interface InputRowProps {
@@ -7,16 +7,36 @@ interface InputRowProps {
 	setCurrentGuess: UseGameStateReturn['setCurrentGuess'];
 	letterStates: LetterState[];
 	discoveredLetters: string[];
+	onEnter: () => void;
 }
 
-export const InputRow: React.FC<InputRowProps> = ({
+export interface InputRowHandle {
+	focusFirstAvailable: () => void;
+}
+
+export const InputRow = forwardRef<InputRowHandle, InputRowProps>(({
 	wordLength,
 	currentGuess,
 	setCurrentGuess,
 	letterStates,
 	discoveredLetters,
-}) => {
+	onEnter,
+}, ref) => {
 	const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+	const rowRef = useRef<HTMLDivElement>(null);
+
+	const focusFirstAvailable = () => {
+		for (let i = 0; i < wordLength; i++) {
+			if (!discoveredLetters[i]) {
+				inputRefs.current[i]?.focus();
+				return;
+			}
+		}
+	};
+
+	useImperativeHandle(ref, () => ({
+		focusFirstAvailable,
+	}));
 
 	useEffect(() => {
 		inputRefs.current = inputRefs.current.slice(0, wordLength);
@@ -30,22 +50,24 @@ export const InputRow: React.FC<InputRowProps> = ({
 		newGuess[index] = letter;
 		setCurrentGuess(newGuess);
 
-		// Auto-advance with 100ms delay
+		// Auto-advance to next empty slot
 		if (letter && index < wordLength - 1) {
-			setTimeout(() => {
-				// Find next empty slot
-				let nextIndex = index + 1;
-				while (nextIndex < wordLength && discoveredLetters[nextIndex]) {
-					nextIndex++;
-				}
-				if (nextIndex < wordLength) {
-					inputRefs.current[nextIndex]?.focus();
-				}
-			}, 100);
+			let nextIndex = index + 1;
+			while (nextIndex < wordLength && discoveredLetters[nextIndex]) {
+				nextIndex++;
+			}
+			if (nextIndex < wordLength) {
+				inputRefs.current[nextIndex]?.focus();
+			}
 		}
 	};
 
 	const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			onEnter();
+			return;
+		}
 		if (e.key === 'Backspace' && !currentGuess[index] && index > 0) {
 			// Find previous editable slot
 			let prevIndex = index - 1;
@@ -60,13 +82,29 @@ export const InputRow: React.FC<InputRowProps> = ({
 
 	const handleFocus = (index: number) => {
 		inputRefs.current[index]?.select();
+		// Scroll row into view when keyboard opens on mobile
+		setTimeout(() => {
+			rowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		}, 150);
+	};
+
+	const getClassName = (index: number) => {
+		const isDiscovered = discoveredLetters[index] !== '';
+		const state = letterStates[index];
+		const classes = ['tile', 'tile-input'];
+
+		if (isDiscovered) classes.push('tile-input-disabled');
+		if (state === 'correct') classes.push('tile-correct');
+		if (state === 'present') classes.push('tile-present');
+		if (state === 'absent') classes.push('tile-absent');
+
+		return classes.join(' ');
 	};
 
 	return (
-		<div style={styles.row}>
+		<div className="row" ref={rowRef}>
 			{currentGuess.map((letter, index) => {
 				const isDiscovered = discoveredLetters[index] !== '';
-				const state = letterStates[index];
 
 				return (
 					<input
@@ -82,17 +120,10 @@ export const InputRow: React.FC<InputRowProps> = ({
 						onKeyDown={(e) => handleKeyDown(index, e)}
 						onFocus={() => handleFocus(index)}
 						disabled={isDiscovered}
-						style={{
-							...styles.tile,
-							...styles.tileInput,
-							...(isDiscovered && styles.tileInputDisabled),
-							...(state === 'correct' && styles.tileCorrect),
-							...(state === 'present' && styles.tilePresent),
-							...(state === 'absent' && styles.tileAbsent),
-						}}
+						className={getClassName(index)}
 					/>
 				);
 			})}
 		</div>
 	);
-};
+});
