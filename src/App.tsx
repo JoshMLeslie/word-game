@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import './App.scss';
 import { EndScreen } from './components/EndScreen';
 import { GameScreen } from './components/GameScreen';
@@ -9,6 +9,7 @@ import { removeFromStorage, saveToStorage } from './util/storage';
 
 export default function App() {
 	const [stats, setStats] = useStats();
+	const usedWords = useRef<Set<string>>(new Set());
 
 	const {
 		currentGuess,
@@ -53,8 +54,17 @@ export default function App() {
 	
 
 	const startGame = async (length: number) => {
-		const words = await DictionaryService.getWords(length);
+		const allWords = await DictionaryService.getWords(length);
+		const availableWords = allWords.filter((w: string) => !usedWords.current.has(w));
+
+		// Reset if we've used all words
+		const words = availableWords.length > 0 ? availableWords : allWords;
+		if (availableWords.length === 0) {
+			usedWords.current.clear();
+		}
+
 		const word = DictionaryService.getRandomWord(words);
+		usedWords.current.add(word);
 
 		setWordLength(length);
 		setTargetWord(word);
