@@ -2,25 +2,29 @@ interface EndScreenProps {
 	stats: GameStats;
 	targetWord: string;
 	guessCount: number;
+	didWin: boolean;
 	onContinue: () => void;
 	onChangeLength: () => void;
+	onResetGame: () => void;
 }
 
 export const EndScreen = ({
 	stats,
 	targetWord,
 	guessCount,
+	didWin,
 	onContinue,
 	onChangeLength,
+	onResetGame,
 }: EndScreenProps) => {
 	return (
 		<div className="container">
 			<div className="content">
-				<h1 className="win-title">You Won!</h1>
+				<h1 className="win-title">{didWin ? 'You Won!' : 'Game Over'}</h1>
 				<p className="win-subtitle">
 					The word was: <strong>{targetWord}</strong>
 				</p>
-				<p className="win-subtitle">Guesses: {guessCount}</p>
+				{didWin && <p className="win-subtitle">Guesses: {guessCount}</p>}
 
 				<div className="stats-box">
 					<h3 className="stats-title">Your Stats</h3>
@@ -54,6 +58,9 @@ export const EndScreen = ({
 				</button>
 				<button className="secondary-button" onClick={onChangeLength}>
 					Change Length
+				</button>
+				<button className="secondary-button" onClick={onResetGame}>
+					Reset Stats
 				</button>
 			</div>
 		</div>

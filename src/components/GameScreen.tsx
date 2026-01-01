@@ -3,6 +3,11 @@ import type { UseGameStateReturn } from '../util/hooks';
 import { FinalizedRow } from './FinalizeRow';
 import { InputRow, type InputRowHandle } from './InputRow';
 
+interface GuessHistoryEntry {
+	guess: string[];
+	states: LetterState[];
+}
+
 interface GameScreenProps {
 	wordLength: number;
 	targetWord: string;
@@ -10,8 +15,10 @@ interface GameScreenProps {
 	currentGuess: string[];
 	setCurrentGuess: UseGameStateReturn['setCurrentGuess'];
 	letterStates: LetterState[];
+	guessHistory: GuessHistoryEntry[];
 	onSubmit: () => void;
 	onNext: () => void;
+	onGiveUp: () => void;
 }
 
 export const GameScreen: React.FC<GameScreenProps> = ({
@@ -21,10 +28,11 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 	currentGuess,
 	setCurrentGuess,
 	letterStates,
+	guessHistory,
 	onSubmit,
 	onNext,
+	onGiveUp,
 }) => {
-	const [showAnswer, setShowAnswer] = useState(false);
 	const [isFading, setIsFading] = useState(false);
 	const inputRowRef = useRef<InputRowHandle>(null);
 	const isRowFull = currentGuess.every((letter) => letter !== '');
@@ -61,6 +69,18 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 		}
 	};
 
+	// Collect present letters from history (excluding already discovered)
+	const discoveredSet = new Set(discoveredLetters.filter(Boolean));
+	const presentLetters = new Set<string>();
+	for (const entry of guessHistory) {
+		for (let i = 0; i < entry.states.length; i++) {
+			if (entry.states[i] === 'present' && !discoveredSet.has(entry.guess[i])) {
+				presentLetters.add(entry.guess[i]);
+			}
+		}
+	}
+	const clueLetters = Array.from(presentLetters).sort();
+
 	return (
 		<div className="container">
 			<div className="game-content">
@@ -78,23 +98,32 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 					isFading={isFading}
 				/>
 
-				<button
-					className="action-button"
-					onClick={hasEvaluation ? handleNext : onSubmit}
-					disabled={!isRowFull && !hasEvaluation}
-				>
-					{hasEvaluation ? 'Next Guess' : 'Submit Guess'}
-				</button>
-
-				<div className="debug">
-					Answer: {showAnswer ? targetWord : 'HIDDEN'}
+				<div className="button-row">
 					<button
-						className="debug-toggle"
-						onClick={() => setShowAnswer(!showAnswer)}
+						className="secondary-button"
+						onClick={onGiveUp}
 					>
-						{showAnswer ? 'Hide' : 'Show'}
+						Show Answer
+					</button>
+					<button
+						className="action-button"
+						onClick={hasEvaluation ? handleNext : onSubmit}
+						disabled={!isRowFull && !hasEvaluation}
+					>
+						{hasEvaluation ? 'Next Guess' : 'Submit Guess'}
 					</button>
 				</div>
+
+				{clueLetters.length > 0 && (
+					<div className="clues">
+						<div className="clues-label">Contains</div>
+						<div className="clues-letters">
+							{clueLetters.map((letter) => (
+								<span key={letter} className="clue-letter">{letter}</span>
+							))}
+						</div>
+					</div>
+				)}
 			</div>
 		</div>
 	);

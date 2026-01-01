@@ -142,7 +142,23 @@ export default function App() {
 		setLetterStates(Array(wordLength).fill(''));
 	};
 
+	const giveUp = () => {
+		setGameState('lost');
+		setStats((prev) => ({
+			gamesPlayed: prev.gamesPlayed + 1,
+			gamesWon: prev.gamesWon,
+			currentStreak: 0,
+		}));
+		removeFromStorage('wordgame_state');
+	};
+
 	const changeLength = () => {
+		setGameState('setup');
+		removeFromStorage('wordgame_state');
+	};
+
+	const resetGame = () => {
+		setStats({ gamesPlayed: 0, gamesWon: 0, currentStreak: 0 });
 		setGameState('setup');
 		removeFromStorage('wordgame_state');
 	};
@@ -155,14 +171,16 @@ export default function App() {
 		return <StartScreen onStart={startGame} />;
 	}
 
-	if (gameState === 'won') {
+	if (gameState === 'won' || gameState === 'lost') {
 		return (
 			<EndScreen
 				stats={stats}
 				targetWord={targetWord}
 				guessCount={guessHistory.length}
+				didWin={gameState === 'won'}
 				onContinue={continueWithSettings}
 				onChangeLength={changeLength}
+				onResetGame={resetGame}
 			/>
 		);
 	}
@@ -175,8 +193,10 @@ export default function App() {
 			currentGuess={currentGuess}
 			setCurrentGuess={setCurrentGuess}
 			letterStates={letterStates}
+			guessHistory={guessHistory}
 			onSubmit={submitGuess}
 			onNext={nextGuess}
+			onGiveUp={giveUp}
 		/>
 	);
 }

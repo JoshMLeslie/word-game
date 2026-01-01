@@ -155,7 +155,6 @@ $spacing-xl: 32px;
 }
 
 .secondary-button {
-  width: 100%;
   padding: $spacing-md $spacing-xl;
   font-size: 18px;
   font-weight: 600;
@@ -164,11 +163,29 @@ $spacing-xl: 32px;
   border: none;
   border-radius: $border-radius-md;
   cursor: pointer;
-  margin-top: $spacing-sm;
   transition: background-color 0.2s;
 
   &:hover {
     background-color: $color-absent-hover;
+  }
+
+  .content & {
+    width: 100%;
+    margin-top: $spacing-sm;
+  }
+}
+
+.button-row {
+  display: flex;
+  align-items: stretch;
+  gap: $spacing-sm;
+  margin-top: $spacing-xs;
+
+  .secondary-button,
+  .action-button {
+    padding: $spacing-sm $spacing-lg;
+    white-space: nowrap;
+    min-width: 0;
   }
 }
 
@@ -181,7 +198,6 @@ $spacing-xl: 32px;
   border: none;
   border-radius: $border-radius-md;
   cursor: pointer;
-  margin-top: $spacing-xs;
   min-width: 200px;
   transition: background-color 0.2s;
 
@@ -294,6 +310,41 @@ $spacing-xl: 32px;
   font-size: 12px;
   color: $text-muted;
   margin-top: 4px;
+}
+
+// Clues
+.clues {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-xs;
+  margin-top: $spacing-lg;
+}
+
+.clues-label {
+  color: $text-muted;
+  font-size: 14px;
+}
+
+.clues-letters {
+  display: flex;
+  gap: $spacing-xs;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.clue-letter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background-color: $color-present;
+  color: $text-primary;
+  font-weight: 600;
+  font-size: 16px;
+  border-radius: $border-radius-sm;
+  text-transform: uppercase;
 }
 
 // Debug
