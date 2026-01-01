@@ -25,9 +25,23 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 	onNext,
 }) => {
 	const [showAnswer, setShowAnswer] = useState(false);
+	const [isFading, setIsFading] = useState(false);
 	const inputRowRef = useRef<InputRowHandle>(null);
 	const isRowFull = currentGuess.every((letter) => letter !== '');
 	const hasEvaluation = letterStates.some((state) => state !== '');
+
+	const handleNext = () => {
+		setIsFading(true);
+		setTimeout(() => {
+			onNext();
+			setIsFading(false);
+		}, 200);
+	};
+
+	// Focus first available input on mount
+	useEffect(() => {
+		inputRowRef.current?.focusFirstAvailable();
+	}, []);
 
 	// Focus first available input after nextGuess (when letterStates become empty)
 	const prevHasEvaluation = useRef(hasEvaluation);
@@ -41,7 +55,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
 	const handleEnter = () => {
 		if (hasEvaluation) {
-			onNext();
+			handleNext();
 		} else if (isRowFull) {
 			onSubmit();
 		}
@@ -61,11 +75,12 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 					letterStates={letterStates}
 					discoveredLetters={discoveredLetters}
 					onEnter={handleEnter}
+					isFading={isFading}
 				/>
 
 				<button
 					className="action-button"
-					onClick={hasEvaluation ? onNext : onSubmit}
+					onClick={hasEvaluation ? handleNext : onSubmit}
 					disabled={!isRowFull && !hasEvaluation}
 				>
 					{hasEvaluation ? 'Next Guess' : 'Submit Guess'}

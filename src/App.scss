@@ -227,6 +227,7 @@ $spacing-xl: 32px;
   text-align: center;
   outline: none;
   caret-color: transparent;
+  transition: opacity 200ms ease-out;
 
   &:focus {
     border-color: $border-focus;
@@ -234,6 +235,10 @@ $spacing-xl: 32px;
 
   &:disabled {
     cursor: not-allowed;
+  }
+
+  &.tile-fading {
+    opacity: 0;
   }
 }
 

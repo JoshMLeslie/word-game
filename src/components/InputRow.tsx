@@ -8,6 +8,7 @@ interface InputRowProps {
 	letterStates: LetterState[];
 	discoveredLetters: string[];
 	onEnter: () => void;
+	isFading?: boolean;
 }
 
 export interface InputRowHandle {
@@ -21,6 +22,7 @@ export const InputRow = forwardRef<InputRowHandle, InputRowProps>(({
 	letterStates,
 	discoveredLetters,
 	onEnter,
+	isFading = false,
 }, ref) => {
 	const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 	const rowRef = useRef<HTMLDivElement>(null);
@@ -97,6 +99,7 @@ export const InputRow = forwardRef<InputRowHandle, InputRowProps>(({
 		if (state === 'correct') classes.push('tile-correct');
 		if (state === 'present') classes.push('tile-present');
 		if (state === 'absent') classes.push('tile-absent');
+		if (isFading) classes.push('tile-fading');
 
 		return classes.join(' ');
 	};
