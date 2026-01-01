@@ -6,7 +6,7 @@ interface GameStats {
 	currentStreak: number;
 }
 
-type GameState = 'setup' | 'playing' | 'won';
+type GameState = 'setup' | 'playing' | 'won' | 'lost';
 
 type GuessHistory = Array<{guess: string[]; states: LetterState[]}>;
 
